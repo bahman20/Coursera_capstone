@@ -1,0 +1,73 @@
+Capstone Final Presentation
+========================================================
+author: Bahman Sarabi
+date: March 25th, 2017
+autosize: true
+font-import: http://fonts.googleapis.com/css?family=Risque
+font-family: 'Arial'
+css: custom.css
+
+<small>This Presentation is a guide to a Shiny app ([link](https://bahman.shinyapps.io/Word_Predict_Coursera_V02/)) which accepts a string from the user and predicts the next word. This presentation also describes the basic algorithms and methods used for the prediction model.</small>
+
+<small>The Shiny app is made for the Coursera Data Science Specialization Capstone Project.</small>
+
+Methods
+========================================================
+<small>The predictive model uses three data files provided by Coursers Data Science Specialization as training datasets. The training data sets are first cleaned, and converted to corpora for text mining. The cleaning (and also the predictive model) was designed to work with the test and training data with
+
+- stop-words and not stemmed,
+- no stop-words and not stemmed,
+- no stop-words and stemmed.
+
+According to results from a test data set, the first approach worked more accurately. Therfore, the prediction model keeps the stop-words and skips stemming.</small>
+
+<small>If you are not familiar with n-gram models, please see the references below:
+
+- [Reference 1](https://lagunita.stanford.edu/c4x/Engineering/CS-224N/asset/slp4.pdf)
+- [Reference 2](https://en.wikipedia.org/wiki/N-gram)
+
+</small>
+
+Smoothing Algorithm
+========================================================
+<small>The prediction model uses an n-gram analysis ($n\leqslant 3$). The model also uses the Kneser-Ney smoothing algorithm.</small>
+
+<small>For a better understanding of Kneser-Ney smoothing, please see this [mini example](http://idiom.ucsd.edu/~rlevy/teaching/winter2009/ligncse256/lectures/kneser_ney_mini_example.pdf).</small>
+
+<small>For a more in-depth understanding, please refer to the references below:
+- [Reference 3](https://people.eecs.berkeley.edu/~klein/cs294-5/chen_goodman.pdf)
+- [Reference 4](http://smithamilli.com/blog/kneser-ney/)
+- [Reference 5](http://www.foldl.me/2014/kneser-ney-smoothing/)
+
+The R files corresponding to this app can be found on [this Github repository](https://github.com/bahman20/Coursera_capstone).</small>
+
+
+Kneser-Ney Smoothing
+========================================================
+<small>The Prediction model uses the follwing relation to calculate the probability of the next word, $w_n$:
+
+$$
+P(w_n|w_i,...,w_{n-1})=\frac{C(w_i,...,w_n)-D}{\Sigma_{w'}C(w_i,...,w')}+\gamma(w_i,...,w_{n-1})P(w_n|w_{i+1},...,w_{n-1}),
+$$
+
+where 
+
+$$
+\gamma=\frac{D\cdot |\{w_i,...,w_{n-1},w'):C(w_i,...,w_{n-1},w')>0\}}{\Sigma_{w'} C(w_i,...,w')}
+$$ 
+
+is the "back-off weight" [[Reference 4](http://smithamilli.com/blog/kneser-ney/)]. The prediction model pre-calculates $\gamma$ for each n-gram, which takes a lot of time. However, when the calculated $\gamma$ values are stored in a data frame of the corresponding n-gram, they can be referenced and used relatively quickly in order to predict the next word with highest probability. This is the way the predictive model used in the Shiny app works. </small>
+
+
+
+
+
+Shiny App Environment
+========================================================
+<small>A picture of the app environment is shown below. At the top of the app window, there is an "Instructions" section.</small> 
+
+![imag](app_pic_2.png)
+
+<small>There is a text input field that can be used by the used to enter a string (phrase). If no string is entered or the "Enter" botton is not clicked on, the word with the highest probability to start a sentense is predicted - which is the word "the". The prediction should not take more than a few seconds.</small>
+
+If one word or more are entered, the app runs the prediction model, and the predicted next word appears at the bottom of the app window in the corresponding field. 
